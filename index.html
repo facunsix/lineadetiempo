@@ -1,0 +1,119 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Línea de Tiempo Familiar</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="descarga.jpg" type="image/x-icon">
+  <link rel="apple-touch-icon" href="descarga.jpg">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <header>
+    <h1>Línea de Tiempo Familiar</h1>
+    <button id="hamburger" aria-label="Mostrar formulario">☰</button>
+  </header>
+
+  <aside id="formulario">
+    <h2>Agregar / Editar Foto</h2>
+    <form id="uploadForm">
+      <input type="hidden" id="idx" value="" />
+      <input type="text" id="titulo" placeholder="Título" required />
+      <input type="date" id="fecha" required />
+      <textarea id="descripcion" placeholder="Descripción (opcional)"></textarea>
+      <input type="file" id="imagen" accept="image/*" />
+      <div class="botones">
+        <button type="submit">Guardar</button>
+        <button type="button" id="cancelEdit">Cancelar</button>
+      </div>
+    </form>
+  </aside>
+
+  <main>
+    <section id="lineaTiempo">
+      <h2>Galería</h2>
+      <div id="contenedor"></div>
+    </section>
+  </main>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="hidden">
+    <span id="closeLightbox">✕</span>
+    <img id="lightboxImg" src="" alt="Ampliada">
+  </div>
+
+  <script>
+    // ✅ Registro del Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => {
+            console.log('✅ ServiceWorker registrado:', reg.scope);
+          })
+          .catch(err => {
+            console.error('❌ Error al registrar ServiceWorker:', err);
+          });
+      });
+    }
+  
+    // ✅ Botón para instalar la app
+    let deferredPrompt;
+    const installButton = document.createElement('div');
+    installButton.id = 'installPrompt';
+    installButton.style.cssText = `
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #4ecdc4;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-weight: bold;
+      display: none;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    `;
+    installButton.innerHTML = `📱 Instalar App`;
+    document.body.appendChild(installButton);
+  
+    window.addEventListener('beforeinstallprompt', (e) => {
+      console.log('📲 beforeinstallprompt detectado');
+      if (localStorage.getItem("instalacionMostrada") !== "true") {
+        e.preventDefault();
+        deferredPrompt = e;
+        installButton.style.display = 'block';
+      }
+    });
+  
+    installButton.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      installButton.style.display = 'none';
+      deferredPrompt.prompt();
+  
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log('Resultado de instalación:', outcome);
+  
+      if (outcome === 'accepted') {
+        console.log('✅ Usuario aceptó la instalación');
+      } else {
+        console.log('❌ Usuario canceló la instalación');
+      }
+  
+      localStorage.setItem("instalacionMostrada", "true");
+      deferredPrompt = null;
+    });
+  
+    window.addEventListener('appinstalled', () => {
+      console.log('✅ Aplicación instalada');
+      installButton.style.display = 'none';
+      deferredPrompt = null;
+      localStorage.setItem("instalacionMostrada", "true");
+    });
+  </script>
+  
+  
+</body>
+</html>
