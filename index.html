@@ -1,10 +1,10 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Línea de Tiempo Familiar</title>
+  <base href="/lineadetiempo/">
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="descarga.jpg" type="image/x-icon">
   <link rel="apple-touch-icon" href="descarga.jpg">
@@ -44,94 +44,6 @@
     <img id="lightboxImg" src="" alt="Ampliada">
   </div>
 
-  <script>
-
-  // Registro del Service Worker mejorado
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', async () => {
-      try {
-        const registration = await navigator.serviceWorker.register('./service-worker.js');
-        console.log('ServiceWorker registrado con éxito:', registration.scope);
-        
-        // Forzar actualización del Service Worker
-        registration.update();
-      } catch (error) {
-        console.error('Error al registrar ServiceWorker:', error);
-      }
-    });
-  }
-
-
-    
-    // ✅ Registro del Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .then(reg => {
-            console.log('✅ ServiceWorker registrado:', reg.scope);
-          })
-          .catch(err => {
-            console.error('❌ Error al registrar ServiceWorker:', err);
-          });
-      });
-    }
-  
-    // ✅ Botón para instalar la app
-    let deferredPrompt;
-    const installButton = document.createElement('div');
-    installButton.id = 'installPrompt';
-    installButton.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #4ecdc4;
-      color: white;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-weight: bold;
-      display: none;
-      cursor: pointer;
-      z-index: 1000;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    `;
-    installButton.innerHTML = `📱 Instalar App`;
-    document.body.appendChild(installButton);
-  
-    window.addEventListener('beforeinstallprompt', (e) => {
-      console.log('📲 beforeinstallprompt detectado');
-      if (localStorage.getItem("instalacionMostrada") !== "true") {
-        e.preventDefault();
-        deferredPrompt = e;
-        installButton.style.display = 'block';
-      }
-    });
-  
-    installButton.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      installButton.style.display = 'none';
-      deferredPrompt.prompt();
-  
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log('Resultado de instalación:', outcome);
-  
-      if (outcome === 'accepted') {
-        console.log('✅ Usuario aceptó la instalación');
-      } else {
-        console.log('❌ Usuario canceló la instalación');
-      }
-  
-      localStorage.setItem("instalacionMostrada", "true");
-      deferredPrompt = null;
-    });
-  
-    window.addEventListener('appinstalled', () => {
-      console.log('✅ Aplicación instalada');
-      installButton.style.display = 'none';
-      deferredPrompt = null;
-      localStorage.setItem("instalacionMostrada", "true");
-    });
-  </script>
-  
-  
+  <script src="script.js"></script>
 </body>
 </html>
